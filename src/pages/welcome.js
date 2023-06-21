@@ -1,7 +1,7 @@
-import RegistrationForm from "@/layout/welcome/RegistrationForm";
+import Register from "@/layout/welcome/register";
 
 const RegistrationPage = () => {
-    return <RegistrationForm />;
+    return <Register />;
 };
 
 export default RegistrationPage;

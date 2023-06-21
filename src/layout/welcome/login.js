@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
 
-const RegistrationForm = () => {
-	const [name, setName] = useState("");
+export default function Login () {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState(null);
@@ -17,7 +16,7 @@ const RegistrationForm = () => {
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({ name, email, password }),
+				body: JSON.stringify({ email, password }),
 			});
 
 			if (response.ok) {
@@ -56,15 +55,6 @@ const RegistrationForm = () => {
 			)}
 			{error && <Alert variant="danger">{error}</Alert>}
 			<Form onSubmit={handleSubmit}>
-				<Form.Group controlId="name">
-					<Form.Label>Name</Form.Label>
-					<Form.Control
-						type="text"
-						placeholder="Enter your name"
-						value={name}
-						onChange={(e) => setName(e.target.value)}
-					/>
-				</Form.Group>
 				<Form.Group controlId="email">
 					<Form.Label>Email</Form.Label>
 					<Form.Control
@@ -90,5 +80,3 @@ const RegistrationForm = () => {
 		</div>
 	);
 };
-
-export default RegistrationForm;
