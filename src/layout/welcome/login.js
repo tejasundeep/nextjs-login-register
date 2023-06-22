@@ -1,82 +1,47 @@
 import { useState } from "react";
-import { Form, Button, Alert } from "react-bootstrap";
+import { signIn } from "next-auth/client";
+import { useRouter } from "next/router";
 
-export default function Login () {
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
-	const [error, setError] = useState(null);
-	const [success, setSuccess] = useState(false);
+const LoginForm = () => {
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const router = useRouter();
 
-	const handleSubmit = async (event) => {
-		event.preventDefault();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-		try {
-			const response = await fetch("api/user/create", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ email, password }),
-			});
+        const result = await signIn("credentials", {
+            redirect: false,
+            username,
+            password,
+        });
 
-			if (response.ok) {
-				setSuccess(true);
-				setError(null);
+        if (!result.error) {
+            // handle successful login, e.g. redirect
+            router.push("/dashboard");
+        } else {
+            // handle error, e.g. show message to user
+            alert(result.error);
+        }
+    };
 
-				setTimeout(() => {
-					setSuccess(false);
-				}, 2000); // Reset success after 2 seconds
-			} else {
-				const data = await response.json();
-				setError(data.error);
-				setSuccess(false);
-
-				setTimeout(() => {
-					setError(null);
-				}, 2000); // Reset error after 2 seconds
-			}
-		} catch (error) {
-			setError("An error occurred. Please try again.");
-			setSuccess(false);
-
-			setTimeout(() => {
-				setError(null);
-			}, 2000); // Reset error after 2 seconds
-		}
-	};
-
-	return (
-		<div>
-			<h1>Registration Form</h1>
-			{success && (
-				<Alert variant="success">
-					Registration successful! You can now log in.
-				</Alert>
-			)}
-			{error && <Alert variant="danger">{error}</Alert>}
-			<Form onSubmit={handleSubmit}>
-				<Form.Group controlId="email">
-					<Form.Label>Email</Form.Label>
-					<Form.Control
-						type="email"
-						placeholder="Enter your email"
-						value={email}
-						onChange={(e) => setEmail(e.target.value)}
-					/>
-				</Form.Group>
-				<Form.Group controlId="password">
-					<Form.Label>Password</Form.Label>
-					<Form.Control
-						type="password"
-						placeholder="Enter your password"
-						value={password}
-						onChange={(e) => setPassword(e.target.value)}
-					/>
-				</Form.Group>
-				<Button variant="primary" type="submit">
-					Register
-				</Button>
-			</Form>
-		</div>
-	);
+    return (
+        <form onSubmit={handleSubmit}>
+            <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Username"
+            />
+            <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+            />
+            <button type="submit">Log in</button>
+        </form>
+    );
 };
+
+export default LoginForm;
