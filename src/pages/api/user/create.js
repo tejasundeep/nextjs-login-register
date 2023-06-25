@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import Joi from "joi";
 import { StatusCodes } from "http-status-codes";
 import dbConnect from "@/database";

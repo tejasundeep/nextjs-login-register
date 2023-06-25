@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 export default NextAuth({
     providers: [
@@ -14,38 +14,40 @@ export default NextAuth({
                 },
                 password: { label: "Password", type: "password" },
             },
-            async authorize(credentials, req) {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_DOMAIN}/api/user/read`, {
-                    method: "POST",
-                    body: JSON.stringify(credentials),
-                    headers: { "Content-Type": "application/json" },
-                });
+            async authorize({ username, password }) {
+                if (!username || !password)
+                    throw new Error(
+                        username
+                            ? "Password cannot be empty"
+                            : "Username cannot be empty"
+                    );
 
-                if (!res.ok) {
-                    return null;
-                }
+                const res = await fetch(`${process.env.NEXT_PUBLIC_DOMAIN}/api/user/read?username=${encodeURIComponent(username)}`,
+                    {
+                        method: "GET",
+                        headers: { "Content-Type": "application/json" },
+                    }
+                );
+
+                if (!res.ok) throw new Error("Invalid email/username");
 
                 const { success, data } = await res.json();
 
-                if (!success || !Array.isArray(data)) {
-                    return null;
-                }
-
-                const user = data.find(
-                    (user) => user.username === credentials.username
-                );
-
                 if (
-                    user &&
-                    bcrypt.compareSync(credentials.password, user.password)
-                ) {
-                    return user;
-                }
-                return null;
+                    !success ||
+                    typeof data !== "object" ||
+                    !data ||
+                    !(await bcrypt.compare(password, data.password))
+                )
+                    throw new Error(
+                        !success || !data
+                            ? "Invalid response from server"
+                            : "Invalid password"
+                    );
+
+                return data;
             },
         }),
     ],
-    jwt: {
-        secret: "MY_SECRET",
-    },
+    jwt: { secret: process.env.JWT_SECRET },
 });
