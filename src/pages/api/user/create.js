@@ -32,7 +32,7 @@ const passwordValidation = (value, helpers) => {
 };
 
 const schema = Joi.object({
-	name: Joi.string().min(3).max(30).required(),
+	username: Joi.string().min(3).max(30).required(),
 	email: Joi.string().email({ minDomainSegments: 2 }).required(),
 	password: Joi.string()
 		.custom(passwordValidation, "Password Validation")
@@ -70,8 +70,8 @@ export default async (req, res) => {
 		const hashedPassword = await bcrypt.hash(value.password, 10);
 
 		await pool.execute(
-			"INSERT INTO `users` (`name`, `email`, `password`) VALUES (?, ?, ?)",
-			[value.name, value.email, hashedPassword]
+			"INSERT INTO `users` (`username`, `email`, `password`) VALUES (?, ?, ?)",
+			[value.username, value.email, hashedPassword]
 		);
 
 		return res

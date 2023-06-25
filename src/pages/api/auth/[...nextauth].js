@@ -1,66 +1,51 @@
 import NextAuth from "next-auth";
-import Providers from "next-auth/providers";
+import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
-import dbConnect from "@/database";
 
 export default NextAuth({
     providers: [
-        Providers.Credentials({
+        CredentialsProvider({
             name: "Credentials",
             credentials: {
-                username: { label: "Username", type: "text" },
+                username: {
+                    label: "Username",
+                    type: "text",
+                    placeholder: "tejasundeep",
+                },
                 password: { label: "Password", type: "password" },
             },
-            authorize: async (credentials) => {
-                try {
-                    const pool = dbConnect();
-                    const [rows] = await pool.query(
-                        "SELECT * FROM users WHERE username = ?",
-                        [credentials.username]
-                    );
+            async authorize(credentials, req) {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_DOMAIN}/api/user/read`, {
+                    method: "POST",
+                    body: JSON.stringify(credentials),
+                    headers: { "Content-Type": "application/json" },
+                });
 
-                    if (rows.length > 0) {
-                        const user = rows[0];
-                        const isValid = await bcrypt.compare(
-                            credentials.password,
-                            user.password
-                        );
-                        if (isValid) {
-                            // We could return the whole user object here, but it might be more secure
-                            // to return only the necessary info
-                            return {
-                                id: user.id,
-                                name: user.name,
-                                email: user.email,
-                            };
-                        } else {
-                            // Invalid password
-                            throw new Error("Invalid password");
-                        }
-                    } else {
-                        // User not found
-                        throw new Error("User not found");
-                    }
-                } catch (error) {
-                    console.error(error);
-                    throw new Error("An error occurred during authentication");
+                if (!res.ok) {
+                    return null;
                 }
+
+                const { success, data } = await res.json();
+
+                if (!success || !Array.isArray(data)) {
+                    return null;
+                }
+
+                const user = data.find(
+                    (user) => user.username === credentials.username
+                );
+
+                if (
+                    user &&
+                    bcrypt.compareSync(credentials.password, user.password)
+                ) {
+                    return user;
+                }
+                return null;
             },
         }),
     ],
-    session: {
-        jwt: true,
-    },
-    callbacks: {
-        async jwt(token, user) {
-            if (user) {
-                token.id = user.id;
-            }
-            return token;
-        },
-        async session(session, token) {
-            session.user.id = token.id;
-            return session;
-        },
+    jwt: {
+        secret: "MY_SECRET",
     },
 });
