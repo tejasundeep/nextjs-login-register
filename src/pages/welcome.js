@@ -13,7 +13,6 @@ const RegistrationPage = () => {
     }
 
     if (session) {
-        ;
         return (
             <>
                 <h1>welcome</h1>
