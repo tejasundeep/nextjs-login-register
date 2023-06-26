@@ -9,23 +9,23 @@ const RegistrationPage = () => {
     const router = useRouter()
 
     const handleSignOut = () => {
-      signOut({ redirect: false })
-        .then(() => router.push('/welcome'))
+        signOut({ redirect: false }).then(() => router.push('/welcome'))
     }
 
-    if (session) {;
+    if (session) {
+        ;
         return (
             <>
-                <h1>welcome</h1>     
+                <h1>welcome</h1>
                 Signed in as {session.user.email} <br />
                 <Button variant="primary" onClick={handleSignOut}>Sign out</Button>
             </>
         );
-    }else{
+    } else {
         return (
             <>
                 <Login />
-                <Register />        
+                <Register />
             </>
         );
     }
