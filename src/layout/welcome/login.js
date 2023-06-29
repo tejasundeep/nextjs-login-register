@@ -1,18 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/router";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import Alert from "react-bootstrap/Alert";
+import { Alert, Button, Form } from "react-bootstrap";
 
-const Login = () => {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+function Login() {
+    const [credentials, setCredentials] = useState({ username: "", password: "" });
     const [error, setError] = useState("");
     const router = useRouter();
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = useCallback(async (e) => {
         e.preventDefault();
+
+        const { username, password } = credentials;
 
         const result = await signIn("credentials", {
             redirect: false,
@@ -21,19 +20,23 @@ const Login = () => {
         });
 
         if (!result.error) {
-            // handle successful login, e.g. redirect
             router.push("/welcome");
         } else {
-            // handle error, set the error state
             setError(result.error);
         }
-    };
+    }, [credentials, router]);
+
+    const handleInputChange = useCallback((e) => {
+        const { name, value } = e.target;
+        setCredentials((prev) => ({ ...prev, [name]: value }));
+    }, []);
 
     useEffect(() => {
         if (error) {
             const timeout = setTimeout(() => {
                 setError("");
-            }, 5000); // Clear error after 5 seconds
+            }, 2000);
+
             return () => clearTimeout(timeout);
         }
     }, [error]);
@@ -47,9 +50,11 @@ const Login = () => {
                     <Form.Label>Username</Form.Label>
                     <Form.Control
                         type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        name="username"
+                        value={credentials.username}
+                        onChange={handleInputChange}
                         placeholder="Username"
+                        autoComplete="off"
                     />
                 </Form.Group>
 
@@ -57,9 +62,11 @@ const Login = () => {
                     <Form.Label>Password</Form.Label>
                     <Form.Control
                         type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        name="password"
+                        value={credentials.password}
+                        onChange={handleInputChange}
                         placeholder="Password"
+                        autoComplete="off"
                     />
                 </Form.Group>
 
@@ -69,6 +76,6 @@ const Login = () => {
             </Form>
         </>
     );
-};
+}
 
 export default Login;

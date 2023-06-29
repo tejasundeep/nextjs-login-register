@@ -24,7 +24,7 @@ const passwordValidation = (value, helpers) => {
 
 	if (value.length < 8) {
 		return helpers.message({
-			custom: "Password length must be exactly 8 characters.",
+			custom: "Password length must be at least 8 characters.",
 		});
 	}
 
@@ -32,7 +32,14 @@ const passwordValidation = (value, helpers) => {
 };
 
 const schema = Joi.object({
-	username: Joi.string().min(3).max(30).required(),
+	username: Joi.string()
+    .regex(/^[a-zA-Z0-9-_]+$/)
+    .min(3)
+    .max(30)
+    .required()
+    .messages({
+      "string.pattern.base": "Inavlid username",
+    }),
 	email: Joi.string().email({ minDomainSegments: 2 }).required(),
 	password: Joi.string()
 		.custom(passwordValidation, "Password Validation")
@@ -76,10 +83,11 @@ export default async (req, res) => {
 
 		return res
 			.status(StatusCodes.OK)
-			.json({ message: "User created successfully." });
+			.json({ value });
 	} catch (err) {
 		return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
 			error: "An error occurred while processing your request.",
+			message: err.message,
 		});
 	}
 };
