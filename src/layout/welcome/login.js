@@ -20,7 +20,7 @@ function Login() {
         });
 
         if (!result.error) {
-            router.push("/welcome");
+            router.push("/");
         } else {
             setError(result.error);
         }

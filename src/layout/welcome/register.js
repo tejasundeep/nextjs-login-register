@@ -42,7 +42,7 @@ export default function Register() {
                 return;
             }
 
-            router.push("/welcome");
+            router.push("/");
         } catch (error) {
             setMessage({ type: "danger", text: "An error occurred. Please try again." });
             startMessageTimeout();
