@@ -31,7 +31,7 @@ export default async (req, res) => {
         const hash = await bcrypt.hash("secret", 10);
         const response = await getUserData(session.user.email, hash);
 
-        res.status(200).json({ response });
+        res.status(200).json(response);
     } catch (error) {
         const statusCode = error.message === 'Not authorized' ? 401 : 500;
         res.status(statusCode).json({ error: error.message });
