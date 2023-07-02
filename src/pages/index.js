@@ -3,6 +3,7 @@ import Login from "@/layout/welcome/login";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import { Button } from "react-bootstrap";
+import Header from "@/layout/header";
 
 const RegistrationPage = () => {
     const { data: session } = useSession();
@@ -10,7 +11,6 @@ const RegistrationPage = () => {
 
     const handleSignOut = () => {
         signOut({ redirect: false }).then(() => {
-            // Make a request to the clear cache endpoint
             fetch('/api/clearCache', { 
                 method: 'POST',
                 headers: {
@@ -26,6 +26,7 @@ const RegistrationPage = () => {
     if (session) {
         return (
             <>
+                <Header />
                 <h1>Welcome</h1>
                 Signed in as {session.user.email} <br />
                 <Button variant="primary" onClick={handleSignOut}>Sign out</Button>
