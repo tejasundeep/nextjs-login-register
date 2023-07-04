@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 let cache = {};
 
 const getUserData = async (email, hash) => {
-    const url = new URL(`${process.env.NEXTAUTH_URL}/api/user/read`);
+    const url = new URL(`${process.env.NEXT_PUBLIC_DOMAIN}/api/user/read`);
     url.searchParams.append('username', email);
     url.searchParams.append('key', hash);
 

@@ -22,7 +22,7 @@ export default NextAuth({
                             : "Username cannot be empty"
                     );
 
-                const res = await fetch(`${process.env.NEXTAUTH_URL}/api/user/read?username=${encodeURIComponent(username)}&key=${await bcrypt.hash(process.env.SECRET_API_KEY, 10)}`,
+                const res = await fetch(`${process.env.NEXT_PUBLIC_DOMAIN}/api/user/read?username=${encodeURIComponent(username)}&key=${await bcrypt.hash(process.env.SECRET_API_KEY, 10)}`,
                     {
                         method: "GET",
                         headers: { "Content-Type": "application/json" },

@@ -4,7 +4,7 @@ const LoggedinUser = () => {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
-        fetch(`${process.env.NEXTAUTH_URL}/api/user/loggedin`)
+        fetch(`${process.env.NEXT_PUBLIC_DOMAIN}/api/user/loggedin`)
             .then(response => response.json())
             .then(userData => setUser(userData))
             .catch(error => setError(error));

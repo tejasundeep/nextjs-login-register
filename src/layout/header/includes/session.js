@@ -4,7 +4,7 @@ const SessionDetails = () => {
     const [session, setSession] = useState(null);
 
     useEffect(() => {
-        fetch(`${process.env.NEXTAUTH_URL}/api/user/session`)
+        fetch(`${process.env.NEXT_PUBLIC_DOMAIN}/api/user/session`)
             .then(response => response.json())
             .then(sessionData => setSession(sessionData))
             .catch(error => setError(error));
